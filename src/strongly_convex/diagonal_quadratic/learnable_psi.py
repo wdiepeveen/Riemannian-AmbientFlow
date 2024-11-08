@@ -58,6 +58,10 @@ class learnable_psi(StronglyConvex):
             # Use the exponential function for the original version
             return torch.exp(self.raw_diagonal)
 
+    @property 
+    def inverse_diagonal(self):
+        return 1 / self.diagonal
+
     def forward(self, x):
         """
         Evaluate the function at x.

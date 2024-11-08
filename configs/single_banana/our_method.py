@@ -59,7 +59,7 @@ def get_config():
 
     # Optional loading of model checkpoints for resuming
     # config.checkpoint = '/home/gb511/riemannian_geo/results/single_banana/affine/our_method_jacobian_iso_vol/checkpoints/checkpoint_epoch_270_loss_2.752.pth'
-    config.checkpoint = ''
+    config.checkpoint = None
     
     # Reproducibility
     config.seed = 1638128
