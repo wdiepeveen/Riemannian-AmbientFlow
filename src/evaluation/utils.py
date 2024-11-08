@@ -7,6 +7,10 @@ from src.manifolds.euclidean.pullback.deformed_gaussian import DeformedGaussianP
 def get_ground_truth_pullback_manifold(config):
     if config.dataset == 'single_banana':
         pullback_manifold = QuadraticBananaPullbackEuclidean()
+    elif config.dataset == 'river':
+        shear, offset, a1, a2 = 2, 0, 1/25, 3
+        river_unimodal_distribution = QuadraticRiver(shear, offset, torch.tensor([a1, a2]))
+        pullback_manifold = DeformedGaussianPullbackEuclidean(river_unimodal_distribution)
 
     return pullback_manifold
 
