@@ -14,7 +14,7 @@ class Manifold:
         :return: N x M
         """
         N, M, _ = X.shape
-        return torch.sqrt(torch.abs(self.inner((x[:,None] * torch.ones((1, M, 1))).reshape(N * M, -1), 
+        return torch.sqrt(torch.abs(self.inner((x[:,None] * torch.ones((1, M, 1), device=x.device)).reshape(N * M, -1), 
                                                X.reshape(N * M, 1, -1), 
                                                X.reshape(N * M, 1, -1)
                                                ).squeeze(-1,-2).reshape(N,M)))
@@ -44,9 +44,9 @@ class Manifold:
     def geodesic(self, x, y, t):
         """
 
-        :param x: Mpoint
-        :param y: Mpoint
-        :param t: N
+        :param x: Mpoint or N x Mpoint
+        :param y: Mpoint or N x Mpoint
+        :param t: N or 1
         :return: N x Mpoint
         """
         raise NotImplementedError(

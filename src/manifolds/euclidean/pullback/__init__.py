@@ -37,12 +37,16 @@ class PullbackEuclidean(Euclidean):
     def geodesic(self, x, y, t):
         """
 
-        :param x: d
-        :param y: d
-        :param t: N
+        :param x: d or N x d
+        :param y: d or N x d
+        :param t: N or 1
         :return: N x d
         """
-        return self.phi.inverse(self.manifold.geodesic(self.phi.forward(x[None])[0], self.phi.forward(y[None])[0], t))
+        if len(x.shape) == len(y.shape) == 1:
+            return self.phi.inverse(self.manifold.geodesic(self.phi.forward(x[None])[0], self.phi.forward(y[None])[0], t))
+        else:
+            assert len(t) == 1
+            return self.phi.inverse(self.manifold.geodesic(self.phi.forward(x), self.phi.forward(y), t))
 
     def log(self, x, y):
         """
@@ -53,8 +57,6 @@ class PullbackEuclidean(Euclidean):
         """
         N, _ = y.shape
         device = x.device
-        print(self.phi.forward(x[None])[0].to(device))
-        print(self.phi.forward(y).to(device))
         return self.phi.differential_inverse(self.phi.forward(x[None]).to(device) * torch.ones(N, device=device)[:, None],
                                                 self.manifold.log(self.phi.forward(x[None])[0].to(device), self.phi.forward(y).to(device))
                                                 )

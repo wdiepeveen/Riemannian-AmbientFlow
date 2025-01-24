@@ -48,7 +48,11 @@ class StandardEuclidean(Euclidean):
         :param t: N
         :return: N x d
         """
-        return (1 - t[:,None]) * x[None] + t[:,None] * y[None]
+        if len(x.shape) == len(y.shape) == 1:
+            return (1 - t[:,None]) * x[None] + t[:,None] * y[None]
+        else:
+            assert len(t) == 1
+            return (1 - t) * x + t * y
 
     def log(self, x, y):
         """
