@@ -2,7 +2,7 @@ import torch
 
 from src.diffeomorphisms import Diffeomorphism
 
-from torch.autograd.functional import jvp
+from torch.autograd.functional import jvp, vjp
 
 
         
@@ -51,4 +51,26 @@ class NFlowDiffeomorphism(Diffeomorphism):
         """
         _, jvp_result = jvp(lambda y: self.diffeo._transform.inverse(y, context=None)[0], (y,), (Y,))
         return jvp_result
+    
+    def adjoint_differential_forward(self, x, X):
+        """
+        Compute the adjoint differential map of phi at x for a vector X.
+        
+        :param x: A batch of points, N x 2.
+        :param X: A batch of tangent vectors, N x 2.
+        :return: A batch of transformed tangent vectors, N x 2.
+        """
+        _, vjp_result = vjp(lambda x: self.diffeo._transform(x, context=None)[0], x, X)
+        return vjp_result[0]
+
+    def adjoint_differential_inverse(self, y, Y):
+        """
+        Compute the adjoint differential map of the inverse of phi at y for a vector Y.
+        
+        :param y: A batch of points, N x 2.
+        :param Y: A batch of tangent vectors, N x 2.
+        :return: A batch of transformed tangent vectors, N x 2.
+        """
+        _, vjp_result = vjp(lambda y: self.diffeo._transform.inverse(y, context=None)[0], (y,), (Y,))
+        return vjp_result[0]
     
