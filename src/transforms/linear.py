@@ -8,7 +8,7 @@ class LinearTransform(Transform):
         super().__init__()
         self.features = features
         self.lower = nn.Parameter(torch.tril(torch.eye(features, features), diagonal=-1))
-        self.upper = nn.Parameter(torch.triu(torch.eye(features, features)))
+        self.upper = nn.Parameter(torch.triu(torch.eye(features, features, diagonal=1)))
         self.bias = nn.Parameter(torch.zeros(features))
         self.efficient_inverse = efficient_inverse
 
@@ -25,13 +25,13 @@ class LinearTransform(Transform):
             return self._inverse(z, context=context)
 
     def _forward(self, x, context=None): # TODO make this more efficient
-        weight = torch.matmul(torch.tril(self.lower, diagonal=-1) + torch.eye(self.features), torch.triu(self.upper))
+        weight = torch.matmul(torch.tril(self.lower, diagonal=-1) + torch.eye(self.features), torch.triu(self.upper, diagonal=1) + torch.eye(self.features))
         z = torch.matmul(x, weight.t()) + self.bias
-        log_abs_det = torch.sum(torch.log(torch.abs(torch.diag(self.upper))))
+        log_abs_det = torch.zeros(1, device=x.device)
         return z, log_abs_det.expand(x.shape[0])
 
     def _inverse(self, z, context=None): # TODO make this more efficient
-        weight = torch.matmul(torch.tril(self.lower, diagonal=-1) + torch.eye(self.features), torch.triu(self.upper))
+        weight = torch.matmul(torch.tril(self.lower, diagonal=-1) + torch.eye(self.features), torch.triu(self.upper, diagonal=1) + torch.eye(self.features))
         x = torch.matmul(z - self.bias, torch.inverse(weight).t())
-        log_abs_det = -torch.sum(torch.log(torch.abs(torch.diag(self.upper))))
+        log_abs_det = torch.zeros(1, device=z.device)
         return x, log_abs_det.expand(z.shape[0])
