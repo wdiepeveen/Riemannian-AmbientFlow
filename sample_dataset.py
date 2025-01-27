@@ -1,6 +1,6 @@
 from src.unimodal.deformed_gaussian.quadratic_banana import QuadraticBanana
 from src.unimodal.deformed_gaussian.quadratic_river import QuadraticRiver
-from src.diffeomorphisms.spherical_diffeomorphism import spherical_diffeomorphism
+from src.diffeomorphisms.spherical import SphericalDiffeomorphism
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,7 +50,7 @@ def get_generation_fn(args):
     elif args.dataset == 'spherical':
         num_samples, num_mcmc_samples, step_size = 5000, 2000, 0.1
         variances = torch.tensor([0.02, torch.pi/16, torch.pi/16])
-        model = DeformedGaussian(spherical_diffeomorphism(), variances)
+        model = DeformedGaussian(SphericalDiffeomorphism(), variances)
         initial_value = torch.tensor([0.5, 0.5, 0.7071], requires_grad=True).unsqueeze(0).repeat(num_samples, 1).clone().detach().requires_grad_(True)
         return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
     elif args.dataset.startswith('sinusoid'):
