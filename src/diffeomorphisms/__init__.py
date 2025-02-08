@@ -74,31 +74,3 @@ class Diffeomorphism(nn.Module):
             torch.Tensor: Inverse transformed tangent vectors of the same shape.
         """
         raise NotImplementedError("Subclasses should implement this")
-    
-    def adjoint_differential_forward(self, x, X):
-        """
-        Computes the differential of the forward transformation at x 
-        for a vector X.
-
-        Args:
-            x (torch.Tensor): Points in the domain, shape (N, d) or (N, c, h, w).
-            X (torch.Tensor): Tangent vectors at x, shape (N, d) or (N, c, h, w).
-
-        Returns:
-            torch.Tensor: Transformed tangent vectors of the same shape.
-        """
-        raise NotImplementedError("Subclasses should implement this")
-
-    def adjoint_differential_inverse(self, y, Y):
-        """
-        Computes the differential of the inverse transformation at y 
-        for a vector Y.
-
-        Args:
-            y (torch.Tensor): Points in the codomain, shape (N, d) or (N, c, h, w).
-            Y (torch.Tensor): Tangent vectors at y, shape (N, d) or (N, c, h, w).
-
-        Returns:
-            torch.Tensor: Inverse transformed tangent vectors of the same shape.
-        """
-        raise NotImplementedError("Subclasses should implement this")

@@ -1,0 +1,23 @@
+import torch
+import torch.nn as nn
+
+from src.inverse_problem_solver.deformed_gaussian.unrolled import UnrolledDeformedGaussianSolver
+
+class GradientDescentUnrolledSolver(UnrolledDeformedGaussianSolver):
+    def __init__(self, forward_operator, diffeomorphism, lambd, n_steps, feed_forward_net, latent_dim=2):
+        super().__init__(forward_operator, diffeomorphism, lambd, n_steps)
+        self.F = feed_forward_net
+        self.mask = torch.cat([torch.ones(latent_dim), torch.zeros(self.d - latent_dim)], 0)
+
+    def encode(self, y):
+        N, _ = y.shape
+        z = torch.zeros(N, self.d, device=y.device)
+        for _ in range(self.D):
+            data_term = self.phi.adjoint_differential_inverse(
+                z, 
+                self.A.adjoint_forward(self.A.forward(self.phi.inverse(z)) - y)
+            )
+            reg_term = self.lambd * self.psi.grad_forward(z)
+            input_tensor = torch.cat([z, data_term + reg_term], dim=1)
+            z = self.mask * (z + self.F.forward(input_tensor))
+        return z

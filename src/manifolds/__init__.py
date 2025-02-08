@@ -1,41 +1,37 @@
-import torch
-
 class Manifold:
     """ Base class describing a manifold of dimension d """
 
     def __init__(self, d):
         self.d = d
-
-    def norm(self, x, X):
-        """
-
-        :param x: N x Mpoint
-        :param X: N x M x Mvector
-        :return: N x M
-        """
-        N, M, _ = X.shape
-        return torch.sqrt(torch.abs(self.inner((x[:,None] * torch.ones((1, M, 1), device=x.device)).reshape(N * M, -1), 
-                                               X.reshape(N * M, 1, -1), 
-                                               X.reshape(N * M, 1, -1)
-                                               ).squeeze(-1,-2).reshape(N,M)))
     
     def inner(self, x, X, Y):
         """
 
-        :param x: N x Mpoint
-        :param X: N x M x Mvector
-        :param Y: N x L x Mvector
+        :param x: N x [Mpoint]
+        :param X: N x M x [Mvector]
+        :param Y: N x L x [Mvector]
         :return: N x M x L
         """
         raise NotImplementedError(
             "Subclasses should implement this"
         )
     
+    def norm(self, x, X):
+        """
+
+        :param x: N x [Mpoint]
+        :param X: N x M x [Mvector]
+        :return: N x M
+        """
+        raise NotImplementedError(
+            "Subclasses should implement this"
+        )
+        
     def barycentre(self, x):
         """
 
-        :param x: N x Mpoint
-        :return: Mpoint
+        :param x: N x [Mpoint]
+        :return: [Mpoint]
         """
         raise NotImplementedError(
             "Subclasses should implement this"
@@ -44,10 +40,10 @@ class Manifold:
     def geodesic(self, x, y, t):
         """
 
-        :param x: Mpoint or N x Mpoint
-        :param y: Mpoint or N x Mpoint
+        :param x: [Mpoint] or N x [Mpoint]
+        :param y: [Mpoint] or N x [Mpoint]
         :param t: N or 1
-        :return: N x Mpoint
+        :return: N x [Mpoint]
         """
         raise NotImplementedError(
             "Subclasses should implement this"
@@ -56,9 +52,9 @@ class Manifold:
     def log(self, x, y):
         """
 
-        :param x: Mpoint
-        :param y: N x Mpoint
-        :return: N x Mvector
+        :param x: [Mpoint]
+        :param y: N x [Mpoint]
+        :return: N x [Mvector]
         """
         raise NotImplementedError(
             "Subclasses should implement this"
@@ -67,9 +63,9 @@ class Manifold:
     def exp(self, x, X):
         """
 
-        :param x: Mpoint
-        :param X: N x Mvector
-        :return: N x Mpoint
+        :param x: [Mpoint]
+        :param X: N x [Mvector]
+        :return: N x [Mpoint]
         """
         raise NotImplementedError(
             "Subclasses should implement this"
@@ -78,8 +74,8 @@ class Manifold:
     def distance(self, x, y):
         """
 
-        :param x: N x M x Mpoint
-        :param y: N x L x Mpoint
+        :param x: N x M x [Mpoint]
+        :param y: N x L x [Mpoint]
         :return: N x M x L
         """
         raise NotImplementedError(
@@ -89,10 +85,10 @@ class Manifold:
     def parallel_transport(self, x, X, y):
         """
 
-        :param x: Mpoint
-        :param X: N x Mvector
-        :param y: Mpoint
-        :return: N x Mpoint
+        :param x: [Mpoint]
+        :param X: N x [Mvector]
+        :param y: [Mpoint]
+        :return: N x [Mpoint]
         """
         raise NotImplementedError(
             "Subclasses should implement this"
