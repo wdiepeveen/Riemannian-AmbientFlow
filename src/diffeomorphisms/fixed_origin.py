@@ -13,7 +13,7 @@ class FixedOriginDiffeomorphism(Diffeomorphism):
         return self.phi.inverse(y + self.phi.forward(self.o[None]))
     
     def differential_forward(self, x, X):
-        return 5 # TODO
+        return self.phi.differential_forward(x, X)
     
     def differential_inverse(self, y, Y):
-        return 6 # TODO
+        return self.phi.differential_inverse(y + self.phi.forward(self.o[None]), Y)
