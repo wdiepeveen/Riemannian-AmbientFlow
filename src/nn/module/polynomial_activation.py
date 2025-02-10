@@ -6,7 +6,8 @@ class PolynomialActivation(nn.Module):
         super().__init__()
         self.d = dim
         self.order = order
-        self.coefficients = nn.Parameter(torch.eye(self.order, self.order)[0,None].repeat(self.d,1))
+        self.coefficients = nn.Parameter(torch.zeros(self.d, self.order))
+        # self.coefficients = nn.Parameter(torch.eye(self.order, self.order)[0,None].repeat(self.d,1))
 
     def forward(self, x):
         powers = torch.arange(self.order, device=x.device) + 1

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from src.inverse_problem_solver.deformed_gaussian.unrolled import UnrolledDeformedGaussianSolver
+from src.inverse_problem_solver.encoder_decoder.deformed_anisotropic_gaussian.unrolled import UnrolledDeformedGaussianSolver
 
 class GradientDescentUnrolledSolver(UnrolledDeformedGaussianSolver):
     def __init__(self, forward_operator, diffeomorphism, lambd, n_steps, feed_forward_net):
@@ -18,5 +18,5 @@ class GradientDescentUnrolledSolver(UnrolledDeformedGaussianSolver):
             )
             reg_term = self.lambd * self.psi.grad_forward(z)
             input_tensor = torch.cat([z, data_term + reg_term], dim=1)
-            z = z + self.F.forward(input_tensor)
+            z = z - self.F.forward(input_tensor)
         return z
