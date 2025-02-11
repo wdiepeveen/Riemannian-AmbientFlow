@@ -1,9 +1,10 @@
 from src.inverse_problem_solver import InverseProblemSolver
 
 class EncoderDecoderSolver(InverseProblemSolver):
-    def __init__(self, forward_operator, diffeomorphism):
+    def __init__(self, forward_operator, diffeomorphism, sparsity_level):
         super().__init__(diffeomorphism.d, forward_operator)
         self.phi = diffeomorphism
+        self.k = sparsity_level
 
     def reconstruct(self, y):
         return self.decode_to_data(self.encode(y))
@@ -23,3 +24,6 @@ class EncoderDecoderSolver(InverseProblemSolver):
         raise NotImplementedError(
             "Subclasses should implement this"
         )
+    
+    def k_sparse_project(self, z):
+        return 5 # TODO

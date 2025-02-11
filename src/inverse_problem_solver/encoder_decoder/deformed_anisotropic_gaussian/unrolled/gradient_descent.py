@@ -4,8 +4,8 @@ import torch.nn as nn
 from src.inverse_problem_solver.encoder_decoder.deformed_anisotropic_gaussian.unrolled import UnrolledDeformedGaussianSolver
 
 class GradientDescentUnrolledSolver(UnrolledDeformedGaussianSolver):
-    def __init__(self, forward_operator, diffeomorphism, lambd, n_steps, feed_forward_net):
-        super().__init__(forward_operator, diffeomorphism, lambd, n_steps)
+    def __init__(self, forward_operator, diffeomorphism, sparsity_level, lambd, n_steps, feed_forward_net):
+        super().__init__(forward_operator, diffeomorphism, sparsity_level, lambd, n_steps)
         self.F = feed_forward_net
 
     def encode(self, y):

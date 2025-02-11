@@ -6,25 +6,31 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
     def __init__(self, d, nflow):
         super().__init__(d)
 
-        self.diffeo = nflow
+        self.nflow = nflow
 
-    def forward(self, x):
+    def forward(self, x, return_log_abs_det=False):
         """
         Forward pass through the diffeomorphism.
         :param x: N x d
         :return: N x d
         """
-        out, _ = self.diffeo._transform(x, context=None)
-        return out
+        out, log_abs_det = self.nflow._transform(x, context=None)
+        if return_log_abs_det:
+            return out, log_abs_det
+        else:
+            return out
 
-    def inverse(self, y):
+    def inverse(self, y, return_log_abs_det=False):
         """
         Inverse pass through the diffeomorphism.
         :param y: N x d
         :return: N x d
         """
-        out, _ = self.diffeo._transform.inverse(y, context=None)
-        return out
+        out, log_abs_det = self.nflow._transform.inverse(y, context=None)
+        if return_log_abs_det:
+            return out, log_abs_det
+        else:
+            return out
 
     def differential_forward(self, x, X):
         """
@@ -33,7 +39,7 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
         :param X: N x d
         :return: N x d
         """
-        _, jvp_result = jvp(lambda x: self.diffeo._transform(x, context=None)[0], (x,), (X,))
+        _, jvp_result = jvp(lambda x: self.nflow._transform(x, context=None)[0], (x,), (X,))
         return jvp_result
 
     def differential_inverse(self, y, Y):
@@ -43,7 +49,7 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
         :param Y: N x d
         :return: N x d
         """
-        _, jvp_result = jvp(lambda y: self.diffeo._transform.inverse(y, context=None)[0], (y,), (Y,))
+        _, jvp_result = jvp(lambda y: self.nflow._transform.inverse(y, context=None)[0], (y,), (Y,))
         return jvp_result
     
     def adjoint_differential_forward(self, x, X):
@@ -54,7 +60,7 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
         :param X: N x d
         :return: N x d
         """
-        _, vjp_result = vjp(lambda x: self.diffeo._transform(x, context=None)[0], x, X)
+        _, vjp_result = vjp(lambda x: self.nflow._transform(x, context=None)[0], x, X)
         return vjp_result[0]
 
     def adjoint_differential_inverse(self, y, Y):
@@ -65,6 +71,6 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
         :param Y: N x d
         :return: N x d
         """
-        _, vjp_result = vjp(lambda y: self.diffeo._transform.inverse(y, context=None)[0], (y,), (Y,))
+        _, vjp_result = vjp(lambda y: self.nflow._transform.inverse(y, context=None)[0], (y,), (Y,))
         return vjp_result[0]
     
