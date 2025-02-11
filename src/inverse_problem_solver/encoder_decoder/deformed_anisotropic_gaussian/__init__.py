@@ -11,4 +11,4 @@ class DeformedGaussianSolver(EncoderDecoderSolver):
     def reconstruction_loss(self,y):
         z = self.encode(y)
         z[:,-1] = 0.
-        return 0.5 * ((self.decode_to_corrupted_data(z) - y)**2).mean(0).sum() + self.lambd * (self.psi.forward(z).mean() + 0.5 * self.psi.diagonal.sum())
+        return 0.5 * ((self.decode_to_corrupted_data(z) - y)**2).mean(0).sum() + self.lambd * (self.psi.forward(z).mean() + 0.5 * self.psi.diagonal.log().sum())
