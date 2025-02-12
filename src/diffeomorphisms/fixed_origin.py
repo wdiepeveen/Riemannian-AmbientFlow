@@ -6,14 +6,14 @@ class FixedOriginDiffeomorphism(Diffeomorphism):
         self.phi = diffeomorphism
         self.o = origin
 
-    def forward(self, x):
-        return self.phi.forward(x) - self.phi.forward(self.o[None])
+    def forward(self, x, **kwargs):
+        return self.phi.forward(x, **kwargs) - self.phi.forward(self.o[None], **kwargs)
     
-    def inverse(self, y):
-        return self.phi.inverse(y + self.phi.forward(self.o[None]))
+    def inverse(self, y, **kwargs):
+        return self.phi.inverse(y + self.phi.forward(self.o[None], **kwargs), **kwargs)
     
-    def differential_forward(self, x, X):
-        return self.phi.differential_forward(x, X)
+    def differential_forward(self, x, X, **kwargs):
+        return self.phi.differential_forward(x, X, **kwargs)
     
-    def differential_inverse(self, y, Y):
-        return self.phi.differential_inverse(y + self.phi.forward(self.o[None]), Y)
+    def differential_inverse(self, y, Y, **kwargs):
+        return self.phi.differential_inverse(y + self.phi.forward(self.o[None], **kwargs), Y, **kwargs)

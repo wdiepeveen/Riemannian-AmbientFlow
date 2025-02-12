@@ -8,29 +8,23 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
 
         self.nflow = nflow
 
-    def forward(self, x, return_log_abs_det=False):
+    def forward(self, x, context=None):
         """
         Forward pass through the diffeomorphism.
         :param x: N x d
         :return: N x d
         """
-        out, log_abs_det = self.nflow._transform(x, context=None)
-        if return_log_abs_det:
-            return out, log_abs_det
-        else:
-            return out
+        out, log_abs_det = self.nflow._transform(x, context=context)
+        return out
 
-    def inverse(self, y, return_log_abs_det=False):
+    def inverse(self, y, context=None):
         """
         Inverse pass through the diffeomorphism.
         :param y: N x d
         :return: N x d
         """
-        out, log_abs_det = self.nflow._transform.inverse(y, context=None)
-        if return_log_abs_det:
-            return out, log_abs_det
-        else:
-            return out
+        out, log_abs_det = self.nflow._transform.inverse(y, context=context)
+        return out
 
     def differential_forward(self, x, X):
         """

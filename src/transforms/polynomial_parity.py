@@ -10,7 +10,7 @@ from src.nn.module.conv2d.masked_conv import MaskedConv2d
 from src.nn.module.polynomial_activation import PolynomialActivation
 
 class PolynomialParityTransform(Transform):
-    def __init__(self, features, order=2, parity=0):
+    def __init__(self, features, context_features=None, order=2, parity=0):
         assert 1 <= order <= 3, "Order must be 1, 2, or 3"
         super().__init__()
         self.d = features
@@ -28,6 +28,8 @@ class PolynomialParityTransform(Transform):
             padding=1,  # Symmetric padding for kernel_size=3
             bias=False   # No bias term needed
         )
+        if context_features is not None:
+             self.lin = nn.Linear(context_features, features)
 
         # Manually set filter weights to [1, 0, 1]
         with torch.no_grad():
@@ -42,7 +44,9 @@ class PolynomialParityTransform(Transform):
         log_abs_det = torch.zeros(1, device=x.device)
         
         # Convolve
-        c = self.conv(self.poly(x_).unsqueeze(1)).squeeze(1)
+        c = self.conv(self.poly(x_).unsqueeze(1)).squeeze(1) 
+        if context is not None: # TODO is this the best way to add the context?
+             c += self.lin(context)
         
         # Apply non-linearity
         z = torch.zeros_like(x_)
@@ -57,6 +61,8 @@ class PolynomialParityTransform(Transform):
         
         # Convolve
         c = self.conv(self.poly(z_).unsqueeze(1)).squeeze(1)
+        if context is not None: # TODO is this the best way to add the context?
+             c += self.lin(context)
         
         # Apply non-linearity
         x = torch.zeros_like(z_)
