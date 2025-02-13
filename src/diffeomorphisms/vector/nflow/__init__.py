@@ -26,27 +26,27 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
         out, log_abs_det = self.nflow._transform.inverse(y, context=context)
         return out
 
-    def differential_forward(self, x, X):
+    def differential_forward(self, x, X, context=None):
         """
         Compute the differential map of phi at x for a vector X.
         :param x: N x d
         :param X: N x d
         :return: N x d
         """
-        _, jvp_result = jvp(lambda x: self.nflow._transform(x, context=None)[0], (x,), (X,))
+        _, jvp_result = jvp(lambda x: self.nflow._transform(x, context=context)[0], (x,), (X,))
         return jvp_result
 
-    def differential_inverse(self, y, Y):
+    def differential_inverse(self, y, Y, context=None):
         """
         Compute the differential map of the inverse of phi at y for a vector Y.
         :param y: N x d
         :param Y: N x d
         :return: N x d
         """
-        _, jvp_result = jvp(lambda y: self.nflow._transform.inverse(y, context=None)[0], (y,), (Y,))
+        _, jvp_result = jvp(lambda y: self.nflow._transform.inverse(y, context=context)[0], (y,), (Y,))
         return jvp_result
     
-    def adjoint_differential_forward(self, x, X):
+    def adjoint_differential_forward(self, x, X, context=None):
         """
         Compute the adjoint differential map of phi at x for a vector X.
         
@@ -54,10 +54,10 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
         :param X: N x d
         :return: N x d
         """
-        _, vjp_result = vjp(lambda x: self.nflow._transform(x, context=None)[0], x, X)
+        _, vjp_result = vjp(lambda x: self.nflow._transform(x, context=context)[0], x, X)
         return vjp_result[0]
 
-    def adjoint_differential_inverse(self, y, Y):
+    def adjoint_differential_inverse(self, y, Y, context=None):
         """
         Compute the adjoint differential map of the inverse of phi at y for a vector Y.
         
@@ -65,6 +65,6 @@ class NFlowVectorDiffeomorphism(VectorDiffeomorphism):
         :param Y: N x d
         :return: N x d
         """
-        _, vjp_result = vjp(lambda y: self.nflow._transform.inverse(y, context=None)[0], (y,), (Y,))
+        _, vjp_result = vjp(lambda y: self.nflow._transform.inverse(y, context=context)[0], (y,), (Y,))
         return vjp_result[0]
     

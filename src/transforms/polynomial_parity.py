@@ -45,8 +45,6 @@ class PolynomialParityTransform(Transform):
         
         # Convolve
         c = self.conv(self.poly(x_).unsqueeze(1)).squeeze(1) 
-        if context is not None: # TODO is this the best way to add the context?
-             c += self.lin(context)
         
         # Apply non-linearity
         z = torch.zeros_like(x_)
@@ -61,8 +59,6 @@ class PolynomialParityTransform(Transform):
         
         # Convolve
         c = self.conv(self.poly(z_).unsqueeze(1)).squeeze(1)
-        if context is not None: # TODO is this the best way to add the context?
-             c += self.lin(context)
         
         # Apply non-linearity
         x = torch.zeros_like(z_)
