@@ -15,16 +15,12 @@ class ParityConv2DTransform(Transform):
         self.P = self.K // 2
 
         self.parity_equivariance = parity_equivariance # If True, the network is equivariant for shifts that are multiples 2 (so not equivariant for all shits)
-        if self.parity_equivariance:
-            self.diagonal = nn.Parameter(torch.ones(self.C)[:,None,None])
-        else:
-            self.diagonal = nn.Parameter(torch.ones(self.C, self.H, self.W))
-
-        self.conv2d = nn.Conv2d(self.C, self.C, self.K, padding=self.P, bias=False)
         
+        self.diagonal = nn.Parameter(torch.ones(self.C)[:,None,None])
+        self.conv2d = nn.Conv2d(self.C, self.C, self.K, padding=self.P, bias=False)
         if bias:
             if self.parity_equivariance:
-                self.bias = nn.Parameter(torch.randn(self.C, self.H, self.W))
+                self.bias = nn.Parameter(torch.randn(self.C)[:,None,None])
             else:
                 self.bias = nn.Parameter(torch.randn(self.C, self.H, self.W))
         else:
@@ -45,10 +41,7 @@ class ParityConv2DTransform(Transform):
         else:
             diagonal = F.softplus(self.diagonal)
             z_2 = z_1 * diagonal
-            if self.parity_equivariance:
-                log_abs_det = torch.log(diagonal.repeat(1,self.H,self.W)[self.image_mask.bool()]).sum().to(x.device) 
-            else:
-                log_abs_det = torch.log(diagonal[self.image_mask.bool()]).sum().to(x.device) 
+            log_abs_det = torch.log(diagonal.repeat(1,self.H,self.W)[self.image_mask.bool()]).sum().to(x.device) 
 
         # Convolve
         weight = self.conv2d.weight * self.weight_mask.to(x.device)
@@ -80,10 +73,7 @@ class ParityConv2DTransform(Transform):
         else:
             diagonal = F.softplus(self.diagonal)
             x_5 = x_4 / diagonal
-            if self.parity_equivariance:
-                log_abs_det = -torch.log(diagonal.repeat(1,self.H,self.W)[self.image_mask.bool()]).sum().to(z.device) 
-            else:
-                log_abs_det = -torch.log(diagonal[self.image_mask.bool()]).sum().to(z.device) 
+            log_abs_det = -torch.log(diagonal.repeat(1,self.H,self.W)[self.image_mask.bool()]).sum().to(z.device) 
 
         return x_5, log_abs_det.expand(z.shape[0])
     
