@@ -1,6 +1,5 @@
 from src.unimodal.deformed_gaussian.quadratic_banana import QuadraticBanana
 from src.unimodal.deformed_gaussian.quadratic_river import QuadraticRiver
-from src.diffeomorphisms.spherical import SphericalDiffeomorphism
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,44 +15,38 @@ torch.autograd.set_detect_anomaly(True)
 
 #Function to return the appropriate generation function based on dataset
 def get_generation_fn(args):
-    if args.dataset == 'single_banana':
-        num_samples, num_mcmc_samples, step_size = 2500, 1000, 0.1
-        shear, offset, a1, a2 = 1/9, 0., 1/4, 4
-        model = QuadraticBanana(shear, offset, torch.tensor([a1, a2]))
-        initial_value = torch.zeros((num_samples, 2), requires_grad=True)
-        return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
+    # if args.dataset == 'single_banana':
+    #     num_samples, num_mcmc_samples, step_size = 2500, 1000, 0.1
+    #     shear, offset, a1, a2 = 1/9, 0., 1/4, 4
+    #     model = QuadraticBanana(shear, offset, torch.tensor([a1, a2]))
+    #     initial_value = torch.zeros((num_samples, 2), requires_grad=True)
+    #     return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
     
-    elif args.dataset == 'squeezed_single_banana':
-        num_samples, num_mcmc_samples, step_size = 5000, 2000, 0.1
-        shear, offset, a1, a2 = 1/9, 0., 1/81, 4
-        model = QuadraticBanana(shear, offset, torch.tensor([a1, a2]))
-        initial_value = torch.zeros((num_samples, 2), requires_grad=True)
-        return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
+    # elif args.dataset == 'squeezed_single_banana':
+    #     num_samples, num_mcmc_samples, step_size = 5000, 2000, 0.1
+    #     shear, offset, a1, a2 = 1/9, 0., 1/81, 4
+    #     model = QuadraticBanana(shear, offset, torch.tensor([a1, a2]))
+    #     initial_value = torch.zeros((num_samples, 2), requires_grad=True)
+    #     return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
     
-    elif args.dataset == 'river':
-        num_samples, num_mcmc_samples, step_size = 5000, 2000, 0.1
-        shear, offset, a1, a2 = 2, 0, 1/25, 3
-        model = QuadraticRiver(shear, offset, torch.tensor([a1, a2]))
-        initial_value = torch.zeros((num_samples, 2), requires_grad=True)
-        return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
+    # elif args.dataset == 'river':
+    #     num_samples, num_mcmc_samples, step_size = 5000, 2000, 0.1
+    #     shear, offset, a1, a2 = 2, 0, 1/25, 3
+    #     model = QuadraticRiver(shear, offset, torch.tensor([a1, a2]))
+    #     initial_value = torch.zeros((num_samples, 2), requires_grad=True)
+    #     return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
     
-    elif args.dataset == 'river3d':
-        num_samples = 10000
-        shear0, shear1 = 1, 2
-        variances=torch.tensor([1/1000, 1/1000, 3])
-        return lambda: generate_generalised_river_samples(num_samples, shear0=shear0, shear1=shear1, variances=variances)
-    elif args.dataset == 'spiral':
-        num_samples = 15000
-        num_revolutions = 2  # Use number of revolutions from arguments
-        return lambda: generate_spiral_samples_2d(num_samples, num_revolutions=num_revolutions)
+    # elif args.dataset == 'river3d':
+    #     num_samples = 10000
+    #     shear0, shear1 = 1, 2
+    #     variances=torch.tensor([1/1000, 1/1000, 3])
+    #     return lambda: generate_generalised_river_samples(num_samples, shear0=shear0, shear1=shear1, variances=variances)
+    # elif args.dataset == 'spiral':
+    #     num_samples = 15000
+    #     num_revolutions = 2  # Use number of revolutions from arguments
+    #     return lambda: generate_spiral_samples_2d(num_samples, num_revolutions=num_revolutions)
     
-    elif args.dataset == 'spherical':
-        num_samples, num_mcmc_samples, step_size = 5000, 2000, 0.1
-        variances = torch.tensor([0.02, torch.pi/16, torch.pi/16])
-        model = DeformedGaussian(SphericalDiffeomorphism(), variances)
-        initial_value = torch.tensor([0.5, 0.5, 0.7071], requires_grad=True).unsqueeze(0).repeat(num_samples, 1).clone().detach().requires_grad_(True)
-        return lambda: langevin_mcmc(model, num_mcmc_samples, step_size, initial_value)
-    elif args.dataset.startswith('sinusoid'):
+    if args.dataset.startswith('sinusoid'):
         parts = args.dataset.split('_')
         K, N = int(parts[1]), int(parts[2])
         num_samples = 100000 #5000 * K * int(np.maximum(np.sqrt(N/5), 1)) #for N=100, we used 1e5 for K=1, 1.5e-5 for K=5 and 2e-5 for K=10. Otherwise we used the formula.

@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-class InverseProblemSolver(nn.Module):
+class InverseProblem(nn.Module):
     def __init__(self, d, forward_operator):
         super().__init__()
         self.d = d
@@ -11,7 +11,7 @@ class InverseProblemSolver(nn.Module):
             "Subclasses should implement this"
         )
     
-    def reconstruction_loss(self,y):
+    def reconstruction_loss(self, y):
         raise NotImplementedError(
             "Subclasses should implement this"
         )
