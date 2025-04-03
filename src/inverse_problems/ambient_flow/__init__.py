@@ -32,16 +32,15 @@ class AmbientFlowProblem(InverseProblem):
 
 
         # Compute logavgexp over all samples
-        logavgexp_loss = (torch.logsumexp(torch.stack(logavgexp_terms), dim=0) - torch.log(torch.tensor(self.M, dtype=torch.float32).to(y.device))).mean()
+        loss = -(torch.logsumexp(torch.stack(logavgexp_terms), dim=0) - torch.log(torch.tensor(self.M, dtype=torch.float32).to(y.device))).mean()
 
         # Regularization
-        sparsity_loss = 0.
         if self.mu is not None:
             D_0_phi_inv = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d), torch.eye(self.d, self.d))
-            sparsity_loss += torch.linalg.norm(D_0_phi_inv, ord='fro')
+            loss += self.mu * torch.linalg.norm(D_0_phi_inv, ord='fro')
 
         # Combine terms with weighting
-        total_loss = -logavgexp_loss + self.mu * sparsity_loss
+        # total_loss = -logavgexp_loss + self.mu * sparsity_loss
 
-        return total_loss
+        return loss
     

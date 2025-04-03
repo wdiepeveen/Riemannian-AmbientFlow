@@ -1,15 +1,15 @@
 import torch
 
-from src.riemannian_autoencoder.vector.nflow import NFlowVectorRiemannianAutoencoder
+from src.riemannian_autoencoder.vector.pullback import PullbackVectorRiemannianAutoencoder
 
-class StandardNFlowVectorRiemannianAutoencoder(NFlowVectorRiemannianAutoencoder):
+class StandardPullbackVectorRiemannianAutoencoder(PullbackVectorRiemannianAutoencoder):
     def __init__(self, pullback_vector_euclidean, epsilon=None, d_epsilon=None):
         super().__init__(pullback_vector_euclidean)
         self.phi = self.manifold.phi
 
         # Compute covariance matrix
-        D_0_phi_inv = self.phi.differential_inverse(torch.zeros(self.d, self.d), torch.eye(self.d, self.d))
-        tangent_space_cov_matrix = D_0_phi_inv @ D_0_phi_inv.T
+        D_0_phi_inv_T = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d), torch.eye(self.d, self.d))
+        tangent_space_cov_matrix = D_0_phi_inv_T.T @ D_0_phi_inv_T
         Sigma, U = torch.linalg.eigh(tangent_space_cov_matrix)
 
         # Reverse the order to sort eigenvalues in descending order

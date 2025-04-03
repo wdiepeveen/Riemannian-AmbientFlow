@@ -1,43 +1,44 @@
+import torch
+
 from src.dimension_reduction import DimensionReductionSolver
 
 class l2PGASolver(DimensionReductionSolver):
     """ Implements base class for solving the PGA problem of finding some rank-r matrix Xi_x \in R^{n x d_1 x ... x d_n} such that \|Y - exp_x(Xi_x)\|_F^2 is small """
-    def __init__(self, N, d, data, euclidean, base_point) -> None:
-        super().__init__(N, d, data)
-        self.data_norm = (self.data**2).mean(0).sum()
+    def __init__(self, N, d, data, euclidean, base_point, device) -> None:
+        super().__init__(N, d, data, device)
 
         self.euclidean = euclidean
         self.base_point = base_point
 
-        self.log_x_data = None
-        self.Xi = {i+1: None for i in range(self.d)}
-        self.exp_x_Xi = {i+1: None for i in range(self.d)}
-        self.error = {i+1: None for i in range(self.d)}
-        self.rel_error = {i+1: None for i in range(self.d)}
+        self.log_x_data = self.euclidean.log(self.base_point.to(self.device), self.data.to(self.device)).detach().cpu()  # ∈ R^{n x d}
 
-    def solve(self, rank):
+    def solve(self, rank, discard_highest_error=None):
         print(f"Computing rank {rank} approximation on tangent space")
-        self.compress(rank)
+        Xi = self.get_Xi(rank)
         print(f"Computing rank {rank} approximation on euclidean space")
-        self.reconstruct(rank)
+        exp_x_Xi = self.euclidean.exp(self.base_point.to(self.device), Xi.to(self.device)).detach().cpu()
         print(f"Computing rank {rank} errors")
-        self.evaluate_error(rank)
+        errors = ((self.data - exp_x_Xi)**2).sum(tuple(range(1, self.data.dim())))
+
+        error = errors.mean()
+        data_norm = (self.data**2).mean(0).sum()
+        rel_error = error / data_norm
+        if discard_highest_error is not None:
+            assert discard_highest_error > 0
+            _, sorted_indices = torch.sort(errors)
+            indices = sorted_indices[:-discard_highest_error]
+            discarded_indices = sorted_indices[-discard_highest_error:]
+            discarded_data = self.data[discarded_indices]
+
+            restricted_error = errors[indices].mean()
+            restricted_data_norm = (self.data[indices]**2).mean(0).sum()
+            restricted_rel_error = restricted_error / restricted_data_norm
+
+            return Xi, exp_x_Xi, {'rel_error':rel_error, 'restricted_rel_error':restricted_rel_error, 'discarded_data':discarded_data, 'errors':errors}
+        else:
+            return Xi, exp_x_Xi, {'rel_error':rel_error}
     
-    def compress(self, rank):
+    def get_Xi(self, rank):
         raise NotImplementedError(
             "Subclasses should implement this"
         )
-    
-    def reconstruct(self, rank):
-        if self.exp_x_Xi[rank] is None:
-            self.exp_x_Xi[rank] = self.euclidean.exp(self.base_point, self.Xi[rank])
-        else:
-            print(f"rank-{rank} already computed")
-    
-    def evaluate_error(self, rank):
-        if self.error[rank] is None:
-            error = ((self.data - self.exp_x_Xi[rank])**2).mean(0).sum()
-            self.error[rank] = error
-            self.rel_error[rank] = error / self.data_norm
-        else:
-            print(f"rank-{rank} already computed")
