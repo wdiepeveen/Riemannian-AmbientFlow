@@ -16,6 +16,8 @@ class StandardNFlowVectorRiemannianAutoencoder(NFlowVectorRiemannianAutoencoder)
         sorted_idx = torch.argsort(Sigma, descending=True)
         self.Sigma = Sigma[sorted_idx]
         self.U = U[:, sorted_idx]
+        for i in range(self.d):
+            print(f"{i} | sigma = {self.Sigma[i]} with u = {self.U[:,i]}")
 
         if epsilon is not None:
             assert d_epsilon is None
@@ -52,6 +54,5 @@ class StandardNFlowVectorRiemannianAutoencoder(NFlowVectorRiemannianAutoencoder)
     def decode(self, p):
         x_bar = self.phi.inverse(torch.zeros(1,self.d,device=p.device))[0]
         Xi = torch.einsum("Nj,ij->Ni", p, self.U[:, :self.d_eps])
-        print(Xi.shape)
         return self.manifold.exp(x_bar, Xi)
     

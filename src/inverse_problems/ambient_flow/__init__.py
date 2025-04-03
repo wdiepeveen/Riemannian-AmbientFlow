@@ -3,7 +3,7 @@ import torch
 from src.inverse_problems import InverseProblem
 
 class AmbientFlowProblem(InverseProblem):
-    def __init__(self, forward_operator, prior_diffeomorphism, posterior_diffeomorphism, noise_level, num_samples=10, reg_param=0.):
+    def __init__(self, forward_operator, prior_diffeomorphism, posterior_diffeomorphism, noise_level, num_samples=10, reg_param=None):
         super().__init__(prior_diffeomorphism.d, forward_operator)
         self.phi = prior_diffeomorphism
         self.phy = posterior_diffeomorphism
@@ -36,8 +36,8 @@ class AmbientFlowProblem(InverseProblem):
 
         # Regularization
         sparsity_loss = 0.
-        if self.mu > 0:
-            D_0_phi_inv = self.phi.differential_inverse(torch.zeros(self.d, self.d), torch.eye(self.d, self.d))
+        if self.mu is not None:
+            D_0_phi_inv = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d), torch.eye(self.d, self.d))
             sparsity_loss += torch.linalg.norm(D_0_phi_inv, ord='fro')
 
         # Combine terms with weighting
@@ -45,15 +45,3 @@ class AmbientFlowProblem(InverseProblem):
 
         return total_loss
     
-    # def hard_thresholding(self, x):
-    #     # Get the top-k values and their indices along the last dimension
-    #     topk_values, topk_indices = torch.topk(torch.abs(x), k=self.k, dim=1, largest=True, sorted=False)
-
-    #     # Create a mask for the top-k elements
-    #     mask = torch.zeros_like(x, dtype=torch.bool)
-    #     mask.scatter_(1, topk_indices, True)
-
-    #     # Apply the mask to retain only the top-k elements
-    #     thresholded_tensor = torch.where(mask, x, torch.zeros_like(x))
-
-    #     return thresholded_tensor

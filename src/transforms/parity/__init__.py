@@ -12,7 +12,7 @@ class ParityTransform(Transform):
         self.parity = parity % 2
         self.data_mask = self.generate_data_mask()
 
-        self.act = activation_class(self.L, **activation_args)
+        self.act = activation_class(self.d, **activation_args)
         self.conv = nn.Conv1d(
             in_channels=1,
             out_channels=1,
