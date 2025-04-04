@@ -39,8 +39,5 @@ class AmbientFlowProblem(InverseProblem):
             D_0_phi_inv = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d), torch.eye(self.d, self.d))
             loss += self.mu * torch.linalg.norm(D_0_phi_inv, ord='fro')
 
-        # Combine terms with weighting
-        # total_loss = -logavgexp_loss + self.mu * sparsity_loss
-
         return loss
     
