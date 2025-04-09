@@ -13,9 +13,19 @@ class l2TangentSpacePCAPullbackVectorRiemannianAutoencoder(PullbackVectorRiemann
         self.dim_red = l2TangentSpacePCAVectorSolver(self.data, self.manifold, self.base_point)
         self.update_dim(latent_dim)
 
+        for i in range(self.d):
+            print(f"{i} | sigma = {self.dim_red.Sigma[i]} with u = {self.dim_red.V[:,i]}")
+
+        if self.m < self.d:
+                self.eps = self.dim_red.Sigma[self.m:].sum() / self.dim_red.Sigma.sum()
+        else:
+            self.eps_effective = 0.
+        print(f"constructed a Riemannian autoencoder with latent dimension = {self.m} and effectice eps = {self.eps}")
+
     def update_dim(self, dim):
         assert dim > 0 and dim <= min(self.d, self.N)
         self.m = dim
+        self.Sigma = self.dim_red.Sigma[0:dim]
         self.V = self.dim_red.V[:,0:dim]
 
     def encode(self, x):
