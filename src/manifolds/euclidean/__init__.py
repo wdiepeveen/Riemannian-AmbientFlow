@@ -1,8 +1,8 @@
 from src.manifolds import Manifold
 
 class Euclidean(Manifold):
-    def __init__(self, d):
-        super().__init__(d)
+    def __init__(self, d, data_shape):
+        super().__init__(d, data_shape)
 
     def metric_tensor(self, x):
         """

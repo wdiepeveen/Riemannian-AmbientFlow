@@ -1,8 +1,9 @@
 class Manifold:
     """ Base class describing a manifold of dimension d """
 
-    def __init__(self, d):
+    def __init__(self, d, data_shape):
         self.d = d
+        self.data_shape = data_shape
     
     def inner(self, x, X, Y):
         """

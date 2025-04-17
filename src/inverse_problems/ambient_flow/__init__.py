@@ -21,7 +21,7 @@ class AmbientFlowProblem(InverseProblem):
         logavgexp_terms = []
         for _ in range(self.M):
             # Sample from p_eta(x|y)
-            x_reconstructed = self.phy.nflow.sample(1, context=y).squeeze() 
+            x_reconstructed = self.phy.nflow.sample(1, context=y)[:,0]
 
             # Compute individual terms in the logavgexp expression
             log_p_theta = self.phi.nflow.log_prob(x_reconstructed) 
@@ -36,7 +36,9 @@ class AmbientFlowProblem(InverseProblem):
 
         # Regularization
         if self.mu is not None:
-            D_0_phi_inv = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d), torch.eye(self.d, self.d))
+            D_0_phi_inv = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d).reshape(self.d, *x_reconstructed.shape[1:]), 
+                                                                torch.eye(self.d, self.d).reshape(self.d, *x_reconstructed.shape[1:])
+                                                                ).reshape(self.d, self.d)
             loss += self.mu * torch.linalg.norm(D_0_phi_inv, ord='fro')
 
         return loss
