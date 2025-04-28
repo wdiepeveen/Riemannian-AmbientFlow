@@ -36,8 +36,8 @@ class AmbientFlowProblem(InverseProblem):
 
         # Regularization
         if self.mu is not None:
-            D_0_phi_inv = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d).reshape(self.d, *x_reconstructed.shape[1:]), 
-                                                                torch.eye(self.d, self.d).reshape(self.d, *x_reconstructed.shape[1:])
+            D_0_phi_inv = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d, device=y.device).reshape(self.d, *x_reconstructed.shape[1:]), 
+                                                                torch.eye(self.d, self.d, device=y.device).reshape(self.d, *x_reconstructed.shape[1:])
                                                                 ).reshape(self.d, self.d)
             loss += self.mu * torch.linalg.norm(D_0_phi_inv, ord='fro')
 

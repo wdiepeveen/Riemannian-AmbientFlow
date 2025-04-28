@@ -3,8 +3,8 @@ import torch
 from src.dimension_reduction.principal_geodesic_analysis.vector import l2PGAVectorSolver
 
 class l2TangentSpacePCAVectorSolver(l2PGAVectorSolver):
-    def __init__(self, data, vector_euclidean, base_point, device="cpu") -> None:
-        super().__init__(data, vector_euclidean, base_point, device)
+    def __init__(self, data, vector_euclidean, base_point) -> None:
+        super().__init__(data, vector_euclidean, base_point)
 
         # compute svd
         self.U, self.Sigma, self.V = torch.svd(self.log_x_data)

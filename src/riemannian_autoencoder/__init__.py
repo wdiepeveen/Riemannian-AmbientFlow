@@ -1,9 +1,10 @@
 class RiemannianAutoencoder:
-    def __init__(self, euclidean):
+    def __init__(self, euclidean, device):
         self.manifold = euclidean
         self.d = self.manifold.d
         self.eps = None
         self.d_eps = None
+        self.device = device
 
     def encode(self, x):
         """

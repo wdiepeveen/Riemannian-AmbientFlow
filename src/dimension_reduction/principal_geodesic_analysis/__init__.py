@@ -4,19 +4,19 @@ from src.dimension_reduction import DimensionReductionSolver
 
 class l2PGASolver(DimensionReductionSolver):
     """ Implements base class for solving the PGA problem of finding some rank-r matrix Xi_x \in R^{n x d_1 x ... x d_n} such that \|Y - exp_x(Xi_x)\|_F^2 is small """
-    def __init__(self, N, d, data, euclidean, base_point, device) -> None:
-        super().__init__(N, d, data, device)
+    def __init__(self, N, d, data, euclidean, base_point) -> None:
+        super().__init__(N, d, data)
 
         self.euclidean = euclidean
         self.base_point = base_point
 
-        self.log_x_data = self.euclidean.log(self.base_point.to(self.device), self.data.to(self.device)).detach().cpu()  # ∈ R^{n x d}
+        self.log_x_data = self.euclidean.log(self.base_point, self.data)  # ∈ R^{n x d}
 
     def solve(self, rank, discard_highest_error=None):
         print(f"Computing rank {rank} approximation on tangent space")
         Xi = self.get_Xi(rank)
         print(f"Computing rank {rank} approximation on euclidean space")
-        exp_x_Xi = self.euclidean.exp(self.base_point.to(self.device), Xi.to(self.device)).detach().cpu()
+        exp_x_Xi = self.euclidean.exp(self.base_point, Xi)
         print(f"Computing rank {rank} errors")
         errors = ((self.data - exp_x_Xi)**2).sum(tuple(range(1, self.data.dim())))
 
