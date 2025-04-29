@@ -3,13 +3,13 @@ import torch
 from src.riemannian_autoencoder.image.pullback import PullbackImageRiemannianAutoencoder
 
 class StandardPullbackImageRiemannianAutoencoder(PullbackImageRiemannianAutoencoder):
-    def __init__(self, pullback_image_euclidean, epsilon=None, d_epsilon=None):
-        super().__init__(pullback_image_euclidean)
+    def __init__(self, pullback_image_euclidean, epsilon=None, d_epsilon=None, device="cpu"):
+        super().__init__(pullback_image_euclidean, device)
         self.data_shape = pullback_image_euclidean.data_shape
         self.phi = self.manifold.phi
 
         # Compute covariance matrix
-        D_0_phi_inv_T = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d).reshape(self.d, self.C, self.H, self.W), torch.eye(self.d, self.d).reshape(self.d, self.C, self.H, self.W)).reshape(self.d, self.d)
+        D_0_phi_inv_T = self.phi.adjoint_differential_inverse(torch.zeros(self.d, self.d, device=self.device).reshape(self.d, self.C, self.H, self.W), torch.eye(self.d, self.d, device=self.device).reshape(self.d, self.C, self.H, self.W)).reshape(self.d, self.d)
         tangent_space_cov_matrix = D_0_phi_inv_T.T @ D_0_phi_inv_T
         Sigma, U = torch.linalg.eigh(tangent_space_cov_matrix)
 
@@ -17,8 +17,8 @@ class StandardPullbackImageRiemannianAutoencoder(PullbackImageRiemannianAutoenco
         sorted_idx = torch.argsort(Sigma, descending=True)
         self.Sigma = Sigma[sorted_idx]
         self.U = U[:, sorted_idx]
-        for i in range(self.d):
-            print(f"{i} | sigma = {self.Sigma[i]} with u = {self.U[:,i]}")
+        # for i in range(self.d):
+        #     print(f"{i} | sigma = {self.Sigma[i]} with u = {self.U[:,i]}")
 
         if epsilon is not None:
             assert d_epsilon is None

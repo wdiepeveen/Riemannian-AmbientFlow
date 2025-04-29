@@ -5,7 +5,7 @@ from src.riemannian_autoencoder.image.pullback import PullbackImageRiemannianAut
 
 class l2TangentSpacePCAPullbackImageRiemannianAutoencoder(PullbackImageRiemannianAutoencoder):
     def __init__(self, pullback_image_euclidean, data, latent_dim):
-        super().__init__(pullback_image_euclidean)
+        super().__init__(pullback_image_euclidean, data.device)
         self.data = data
         self.N = self.data.shape[0]
         self.base_point = self.manifold.barycentre(self.data)
@@ -13,8 +13,8 @@ class l2TangentSpacePCAPullbackImageRiemannianAutoencoder(PullbackImageRiemannia
         self.dim_red = l2TangentSpacePCAImageSolver(self.data, self.manifold, self.base_point)
         self.update_dim(latent_dim)
 
-        for i in range(self.d):
-            print(f"{i} | sigma = {self.dim_red.Sigma[i]} with u = {self.dim_red.V[:,i]}")
+        # for i in range(self.d):
+        #     print(f"{i} | sigma = {self.dim_red.Sigma[i]} with u = {self.dim_red.V[:,i]}")
 
         if self.m < self.d:
                 self.eps = self.dim_red.Sigma[self.m:].sum() / self.dim_red.Sigma.sum()

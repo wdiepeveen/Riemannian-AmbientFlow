@@ -3,8 +3,8 @@ import torch
 from src.dimension_reduction.principal_geodesic_analysis.image import l2PGAImageSolver
 
 class l2TangentSpacePCAImageSolver(l2PGAImageSolver):
-    def __init__(self, data, image_euclidean, base_point, device="cpu") -> None:
-        super().__init__(data, image_euclidean, base_point, device)
+    def __init__(self, data, image_euclidean, base_point) -> None:
+        super().__init__(data, image_euclidean, base_point)
 
         # compute svd
         self.U, self.Sigma, self.V = torch.svd(self.log_x_data.reshape(-1, self.d))
