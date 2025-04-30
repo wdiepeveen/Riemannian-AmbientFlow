@@ -11,11 +11,6 @@ class AmbientFlowProblem(InverseProblem):
         self.M = num_samples
         self.mu = reg_param
 
-    def reconstruct(self, y): # TODO
-        raise NotImplementedError(
-            "Subclasses should implement this"
-        )
-
     def reconstruction_loss(self, y):
         # Initialize loss components
         logavgexp_terms = []
