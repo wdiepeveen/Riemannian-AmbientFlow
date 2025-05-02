@@ -4,7 +4,7 @@ class InverseProblem(nn.Module):
     def __init__(self, d, forward_operator):
         super().__init__()
         self.d = d
-        self.A = forward_operator
+        self.forward_operator = forward_operator
     
     def reconstruction_loss(self, y):
         raise NotImplementedError(
