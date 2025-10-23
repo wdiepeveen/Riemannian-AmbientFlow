@@ -34,7 +34,7 @@ class NFlowImageDiffeomorphism(ImageDiffeomorphism):
         :param X: N x (C, H, W)
         :return: N x (C, H, W)
         """
-        _, out = jvp(lambda x: self.nflow._transform(x, context=None)[0], (x,), (X,))
+        _, out = jvp(lambda x: self.nflow._transform(x, context=None)[0], (x,), (X,), create_graph=True)
         return out
 
     def differential_inverse(self, y, Y, flattened_out=False):
@@ -45,7 +45,7 @@ class NFlowImageDiffeomorphism(ImageDiffeomorphism):
         :param Y: N x (C, H, W)
         :return: N x (C, H, W)
         """
-        _, out = jvp(lambda y: self.nflow._transform.inverse(y, context=None)[0], (y,), (Y,))
+        _, out = jvp(lambda y: self.nflow._transform.inverse(y, context=None)[0], (y,), (Y,), create_graph=True)
         return out
     
     def adjoint_differential_forward(self, x, X, context=None):
@@ -56,7 +56,7 @@ class NFlowImageDiffeomorphism(ImageDiffeomorphism):
         :param X: N x d
         :return: N x d
         """
-        _, vjp_result = vjp(lambda x: self.nflow._transform(x, context=context)[0], x, X)
+        _, vjp_result = vjp(lambda x: self.nflow._transform(x, context=context)[0], (x,), (X,), create_graph=True)
         return vjp_result[0]
 
     def adjoint_differential_inverse(self, y, Y, context=None):
@@ -67,5 +67,5 @@ class NFlowImageDiffeomorphism(ImageDiffeomorphism):
         :param Y: N x d
         :return: N x d
         """
-        _, vjp_result = vjp(lambda y: self.nflow._transform.inverse(y, context=context)[0], (y,), (Y,))
+        _, vjp_result = vjp(lambda y: self.nflow._transform.inverse(y, context=context)[0], (y,), (Y,), create_graph=True)
         return vjp_result[0]

@@ -8,13 +8,10 @@ class l2TangentSpacePCAPullbackImageRiemannianAutoencoder(PullbackImageRiemannia
         super().__init__(pullback_image_euclidean, data.device)
         self.data = data
         self.N = self.data.shape[0]
-        self.base_point = self.manifold.barycentre(self.data)
+        self.base_point = self.manifold.barycentre(self.data).detach()
 
         self.dim_red = l2TangentSpacePCAImageSolver(self.data, self.manifold, self.base_point)
         self.update_dim(latent_dim)
-
-        # for i in range(self.d):
-        #     print(f"{i} | sigma = {self.dim_red.Sigma[i]} with u = {self.dim_red.V[:,i]}")
 
         if self.m < self.d:
                 self.eps = self.dim_red.Sigma[self.m:].sum() / self.dim_red.Sigma.sum()
@@ -25,8 +22,8 @@ class l2TangentSpacePCAPullbackImageRiemannianAutoencoder(PullbackImageRiemannia
     def update_dim(self, dim):
         assert dim > 0 and dim <= min(self.d, self.N)
         self.m = dim
-        self.Sigma = self.dim_red.Sigma[0:dim]
-        self.V = self.dim_red.V[:,0:dim]
+        # self.Sigma = self.dim_red.Sigma[0:dim]
+        self.V = self.dim_red.V[:,0:dim].detach()
 
     def encode(self, x):
         log_q_x = self.manifold.log(self.base_point.to(x.device), x).reshape(-1, self.d)

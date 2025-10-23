@@ -93,4 +93,3 @@ class PullbackImageEuclidean(ImageEuclidean):
                                                                                  )
                                                 )
     
-    # TODO pullback Christoffel symbols etc.

@@ -10,7 +10,19 @@ class l2PGASolver(DimensionReductionSolver):
         self.euclidean = euclidean
         self.base_point = base_point
 
-        self.log_x_data = self.euclidean.log(self.base_point, self.data)  # ∈ R^{n x d}
+        # self.log_x_data = self.euclidean.log(self.base_point, self.data)  # ∈ R^{n x d}
+
+        batch_size = 64  # adjust as needed
+        n = self.data.shape[0]
+        log_x_data = []
+
+        for i in range(0, n, batch_size):
+            end = min(i + batch_size, n)
+            batch = self.data[i:end]
+            log_batch = self.euclidean.log(self.base_point, batch)  # ∈ R^{batch x d}
+            log_x_data.append(log_batch)
+
+        self.log_x_data = torch.cat(log_x_data, dim=0)
 
     def solve(self, rank, discard_highest_error=None):
         print(f"Computing rank {rank} approximation on tangent space")
