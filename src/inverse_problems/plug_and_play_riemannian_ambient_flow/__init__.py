@@ -34,7 +34,7 @@ class PnPRiemannianAmbientFlowProblem(InverseProblem):
             D_0_phi_inv = self.phi_prior.adjoint_differential_inverse(torch.zeros(self.d, self.d, device=y.device).reshape(self.d, *x_reconstructed.shape[1:]), 
                                                                     torch.eye(self.d, self.d, device=y.device).reshape(self.d, *x_reconstructed.shape[1:])
                                                                     ).reshape(self.d, self.d)
-            loss += self.mu_1 * torch.linalg.norm(D_0_phi_inv, ord='fro')
+            loss += self.mu * torch.linalg.norm(D_0_phi_inv, ord='fro')
 
         return loss
     

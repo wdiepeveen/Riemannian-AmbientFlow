@@ -4,11 +4,14 @@ from src.dimension_reduction.principal_geodesic_analysis.image.l2_tangent_space_
 from src.riemannian_autoencoder.image.pullback import PullbackImageRiemannianAutoencoder
 
 class l2TangentSpacePCAPullbackImageRiemannianAutoencoder(PullbackImageRiemannianAutoencoder):
-    def __init__(self, pullback_image_euclidean, data, latent_dim):
+    def __init__(self, pullback_image_euclidean, data, latent_dim, base_point=None):
         super().__init__(pullback_image_euclidean, data.device)
         self.data = data
         self.N = self.data.shape[0]
-        self.base_point = self.manifold.barycentre(self.data).detach()
+        if base_point is None:
+            self.base_point = self.manifold.barycentre(self.data).detach()
+        else:
+            self.base_point = base_point
 
         self.dim_red = l2TangentSpacePCAImageSolver(self.data, self.manifold, self.base_point)
         self.update_dim(latent_dim)
