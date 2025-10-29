@@ -14,16 +14,15 @@ class RiemannianAmbientFlowProblem(InverseProblem):
 
     def reconstruction_loss(self, y, x=None):
         # Initialize loss components
-        context = self.get_context(y)
         logavgexp_terms = []
         for _ in range(self.M):
             # Sample from p_post(x|y)
-            x_reconstructed = self.p_post.sample(1, context=context)[:,0]
+            x_reconstructed = self.p_post.sample(1, context=y)[:,0]
 
             # Compute individual terms in the logavgexp expression
             log_p_prior = self.phi_prior.nflow.log_prob(x_reconstructed) 
             log_p_noise = -(1/(2 * self.sigma**2) * (self.forward_operator.forward(x_reconstructed) - y)**2).sum(dim=tuple(range(1,y.dim())))
-            log_p_post = self.p_post.log_prob(x_reconstructed, context=context)
+            log_p_post = self.p_post.log_prob(x_reconstructed, context=y)
 
             logavgexp_terms.append(log_p_prior + log_p_noise - log_p_post)
 
@@ -44,10 +43,10 @@ class RiemannianAmbientFlowProblem(InverseProblem):
 
         return loss
     
-    def get_context(self, y):
-        x_init = self.forward_operator.pseudo_inverse(y)
-        return torch.cat([x_init, torch.zeros_like(x_init)], dim=1)
+    # def get_context(self, y):
+    #     x_init = self.forward_operator.pseudo_inverse(y)
+    #     return torch.cat([x_init, torch.zeros_like(x_init)], dim=1)
     
-    def reconstruct(self, y):
-        return self.p_post._context_encoder(self.get_context(y)).chunk(2, dim=1)[0]
+    # def reconstruct(self, y):
+    #     return self.p_post._context_encoder(self.get_context(y)).chunk(2, dim=-1)[0]
     
