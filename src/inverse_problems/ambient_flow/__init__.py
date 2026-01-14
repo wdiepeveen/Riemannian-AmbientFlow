@@ -20,7 +20,7 @@ class AmbientFlowProblem(InverseProblem):
 
             # Compute individual terms in the logavgexp expression
             log_p_theta = self.phi.nflow.log_prob(x_reconstructed) 
-            log_q_n = -(1/(2 * self.sigma**2) * (self.A.forward(x_reconstructed) - y)**2).sum(dim=tuple(range(1,y.dim())))
+            log_q_n = -(1/(2 * self.sigma**2) * (self.forward_operator.forward(x_reconstructed) - y)**2).sum(dim=tuple(range(1,y.dim())))
             log_p_eta = self.phy.nflow.log_prob(x_reconstructed, context=y)
 
             logavgexp_terms.append(log_p_theta + log_q_n - log_p_eta)
