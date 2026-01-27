@@ -2,7 +2,7 @@
 
     [1] W. Diepeveen, O. Leong.  
     Riemannian AmbientFlow: Towards Simultaneous Manifold Learning and Generative Modeling from Corrupted Data.
-    arXiv preprint arXiv:2601.18728. 2026 MM DD.
+    arXiv preprint arXiv:2601.18728. 2026 Jan 26.
 
 Setup
 -----
